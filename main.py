@@ -7,7 +7,7 @@ import pdb
 RANDOM_GEN = None
 
 # Configuration
-POPULATION_LIMIT = 4
+POPULATION_LIMIT = 50
 DISTANCE = [
     [0, 1, 1, 4],
     [1, 0, 2, 5],
@@ -24,7 +24,7 @@ ITEMS = [
 ROUTE_FITNESS_WEIGHT = 1
 BUY_FITNESS_WEIGHT = 1
 
-GENERATION_THRESHOLD = 10
+GENERATION_THRESHOLD = 100
 
 # Definition
 class Person:
@@ -41,6 +41,8 @@ class Person:
 
 
     def update_fitness(self):
+        self.bought = 0
+        self.done = False
         self.fitness = self.calculate_fitness()
 
     def _update_bought(self):
@@ -183,7 +185,7 @@ class PopulationGenerator:
 
         # p.route = random.sample(p.route[1:], k=len(p.route)) # remove initial
         # p.route.insert(0, 0) # add initial at 0
-        return list(population)
+        return population
 
     def generate_new(self, pop: List[Person]) -> List[Person]:
         """Generate new generation"""
@@ -213,8 +215,12 @@ def run() -> Person:
     population.sort(key=PopulationGenerator._util_fitness_sort)
     return population[0] # Return first one. AKA winner.
 
+def _util_init_random_gen(seed):
+    global RANDOM_GEN
+    RANDOM_GEN = random.Random(seed)
+
 if __name__ == "__main__":
-    seed = "juanillo culo"
+    seed = "quiero morir"
     
     RANDOM_GEN = random.Random(seed)
     winner = run()
