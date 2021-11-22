@@ -65,22 +65,6 @@ class Person:
             if self.done:
                 break
 
-        # for i in range(len(self.route)):
-        #     if self.done:
-        #         break
-        #     if i != len(self.route) - 1:
-        #         sum_route += DISTANCE[temp_route[i]][self.route[i]]
-        #         print(f"f[{i}]: {DISTANCE[self.route[i]][temp_route[i]]}")
-        #     if self.route[i] in self.buy:
-        #         order = self.buy.index(self.route[i])
-        #         sum_items += ITEMS[self.route[i]][self.buy_order[order]]
-        #         print(f"c[{i}]: {ITEMS[self.route[i]][self.buy_order[order]]}")
-        #         self._update_bought()
-        #         if self.done:
-        #             print("im fucking done")
-        #         else:
-        #             print("im not done")
-
         total = sum_items * BUY_FITNESS_WEIGHT + sum_route * ROUTE_FITNESS_WEIGHT
         return total
 
@@ -177,7 +161,7 @@ class PopulationGenerator:
             buy_order = []
             route = RANDOM_GEN.sample(route_choices, k=len(route_choices))
             route.insert(0, 0)
-            buy = RANDOM_GEN.sample(route, k=2)
+            buy = RANDOM_GEN.sample(route, k=len(ITEMS[0]))
             buy_order = RANDOM_GEN.sample(buy_order_choices, k=len(buy_order_choices))
             population.append(
                 Person(route=list(route), items=list(buy), buy_order=list(buy_order))
@@ -222,8 +206,8 @@ def _util_init_random_gen(seed):
 
 
 if __name__ == "__main__":
-    seed = "quiero morir"
+    seed = "humberto trabaja"
 
     RANDOM_GEN = random.Random(seed)
     winner = run()
-    print(winner)
+    print("\nCamino recomendado:\n", winner)
