@@ -12,7 +12,7 @@ DISTANCE = [
     [0, 1, 1, 4],
     [1, 0, 2, 5],
     [1, 2, 0, 3],
-    [4, 5, 3, 0]
+    [4, 5, 3, 0],
 ]
 ITEMS = [
     [2, 3],
@@ -29,16 +29,15 @@ GENERATION_THRESHOLD = 100
 # Definition
 class Person:
     def __init__(self, route: List[int], items: List[int], buy_order: List[int]):
-        self.route = list(route) #genome 2
-        self.buy = list(items)  #genome 1
-        self.buy_order = list(buy_order) # genome 3
+        self.route = list(route)  # genome 2
+        self.buy = list(items)  # genome 1
+        self.buy_order = list(buy_order)  # genome 3
 
         # data
         self.bought = 0
         self.done = False
         self.qty_to_buy = len(self.buy)
         self.fitness = self.calculate_fitness()
-
 
     def update_fitness(self):
         self.bought = 0
@@ -55,17 +54,17 @@ class Person:
         sum_route = 0
         sum_items = 0
 
-        for i in range(len(self.route)-1):
-            #calculate route fitness.
-            sum_route += DISTANCE[self.route[i]][self.route[i+1]]
-            #calculate items
-            if self.route[i+1] in self.buy:
-                index = self.buy.index(self.route[i+1])
-                sum_items += ITEMS[self.route[i+1]][self.buy_order[index]]
+        for i in range(len(self.route) - 1):
+            # calculate route fitness.
+            sum_route += DISTANCE[self.route[i]][self.route[i + 1]]
+            # calculate items
+            if self.route[i + 1] in self.buy:
+                index = self.buy.index(self.route[i + 1])
+                sum_items += ITEMS[self.route[i + 1]][self.buy_order[index]]
                 self._update_bought()
             if self.done:
                 break
-            
+
         # for i in range(len(self.route)):
         #     if self.done:
         #         break
@@ -81,12 +80,17 @@ class Person:
         #             print("im fucking done")
         #         else:
         #             print("im not done")
-        
+
         total = sum_items * BUY_FITNESS_WEIGHT + sum_route * ROUTE_FITNESS_WEIGHT
         return total
 
     def __str__(self):
-        return ((self.route.__str__() + self.buy.__str__() + self.buy_order.__str__()) + " - " + str(self.fitness))
+        return (
+            (self.route.__str__() + self.buy.__str__() + self.buy_order.__str__())
+            + " - "
+            + str(self.fitness)
+        )
+
 
 # Mutation for new generations
 class Mutator:
@@ -110,7 +114,6 @@ class Mutator:
         # if new_p.fitness < p.fitness:
         #     return new_p
         return new_p
-         
 
     def _modify_route(p: Person) -> Person:
         """Function only swaps once"""
@@ -118,15 +121,15 @@ class Mutator:
         index = RANDOM_GEN.choice(range(len(route)))
         replaced = route.pop(index)
         index = RANDOM_GEN.choice(range(len(route)))
-        route.insert(index ,replaced)
-        route.insert(0, 0) # append start
+        route.insert(index, replaced)
+        route.insert(0, 0)  # append start
         p.route = list(route)
         return copy.deepcopy(p)
 
     def modify(p: Person) -> Person:
         """Modifies attributes depending on chances.
-        
-        Here are the set of rules based on random generation. 
+
+        Here are the set of rules based on random generation.
         - Just argue about modus tollens and modus ponens seen in class. /shrug
         """
         random = RANDOM_GEN.randint(1, 100)
@@ -141,6 +144,7 @@ class Mutator:
 
         return p
 
+
 # Generator
 class PopulationGenerator:
     def _util_fitness_sort(p: Person):
@@ -152,7 +156,7 @@ class PopulationGenerator:
         new_list = list(pop)
         new_list.sort(key=PopulationGenerator._util_fitness_sort)
         # Thanos'd
-        new_list = new_list[:(POPULATION_LIMIT//2)]
+        new_list = new_list[: (POPULATION_LIMIT // 2)]
         return new_list
 
     def _mutation(self, p: Person) -> Person:
@@ -172,15 +176,11 @@ class PopulationGenerator:
             buy = []
             buy_order = []
             route = RANDOM_GEN.sample(route_choices, k=len(route_choices))
-            route.insert(0,0)
+            route.insert(0, 0)
             buy = RANDOM_GEN.sample(route, k=2)
             buy_order = RANDOM_GEN.sample(buy_order_choices, k=len(buy_order_choices))
             population.append(
-                Person(
-                    route=list(route),
-                    items=list(buy),
-                    buy_order=list(buy_order)
-                )
+                Person(route=list(route), items=list(buy), buy_order=list(buy_order))
             )
 
         # p.route = random.sample(p.route[1:], k=len(p.route)) # remove initial
@@ -202,7 +202,7 @@ def print_generation(pop: List[Person], gen: int):
     print(f"Gen {gen+1} min: {min((p.fitness for p in pop))}")
     for person in pop:
         print(person)
-    
+
 
 def run() -> Person:
     pop_gen = PopulationGenerator()
@@ -213,15 +213,17 @@ def run() -> Person:
             population = list(pop_gen.generate_new(pop=population))
         print_generation(pop=population, gen=i)
     population.sort(key=PopulationGenerator._util_fitness_sort)
-    return population[0] # Return first one. AKA winner.
+    return population[0]  # Return first one. AKA winner.
+
 
 def _util_init_random_gen(seed):
     global RANDOM_GEN
     RANDOM_GEN = random.Random(seed)
 
+
 if __name__ == "__main__":
     seed = "quiero morir"
-    
+
     RANDOM_GEN = random.Random(seed)
     winner = run()
     print(winner)
