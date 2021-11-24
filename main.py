@@ -1,10 +1,10 @@
 import copy
-from typing import List
 import random
-import pdb
-import numpy as np
+from typing import List
+
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 # Set up
 RANDOM_GEN = None
@@ -17,12 +17,7 @@ DISTANCE = [
     [1, 2, 0, 3],
     [4, 5, 3, 0],
 ]
-ITEMS = [
-    [2, 3],
-    [3, 2],
-    [1, 1],
-    [4, 1]
-]
+ITEMS = [[2, 3], [3, 2], [1, 1], [4, 1]]
 
 ROUTE_FITNESS_WEIGHT = 1
 BUY_FITNESS_WEIGHT = 1
@@ -39,7 +34,7 @@ pos = nx.spring_layout(G)
 nx.draw(G, pos, with_labels=True)
 
 ## Create edge labels
-labels = nx.get_edge_attributes(G,'weight')
+labels = nx.get_edge_attributes(G, "weight")
 
 ## Draw edge labels according to node positions
 nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
@@ -205,21 +200,23 @@ class PopulationGenerator:
 
 def print_generation(pop: List[Person], gen: int):
     pop_by_fitness = {p.fitness: p for p in pop}
-    
+
     min_fitness = min(pop_by_fitness.keys())
     person = pop_by_fitness[min_fitness]
     route = person.route
     color_map = ["red" if node in person.buy else "blue" for node in route]
-    
+
     plt.figure()
     xD = nx.path_graph(route, G)
     nx.draw(xD, pos=pos, with_labels=True, node_color=color_map)
     bought_where_message = ""
     for idx, item in enumerate(person.buy):
-        bought_where_message += f"Compro el item {person.buy_order[idx]} en el nodo {item}\n"
+        bought_where_message += (
+            f"Compro el item {person.buy_order[idx]} en el nodo {item}\n"
+        )
     plt.title(f"Ruta: {route} \n Peso total:{min_fitness} \n{bought_where_message}")
-    plt.savefig(f"Gen_{gen+1}_min.png", bbox_inches='tight')
-    
+    plt.savefig(f"Gen_{gen+1}_min.png", bbox_inches="tight")
+
     print(f"Gen {gen+1} min: {min_fitness}")
     for person in pop:
         print(person)
