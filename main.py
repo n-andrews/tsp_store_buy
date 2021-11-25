@@ -215,7 +215,7 @@ def print_generation(pop: List[Person], gen: int):
             f"Compro el item {person.buy_order[idx]} en el nodo {item}\n"
         )
     plt.title(f"Ruta: {route} \n Peso total:{min_fitness} \n{bought_where_message}")
-    plt.savefig(f"Gen_{gen+1}_min.png", bbox_inches="tight")
+    plt.savefig(f"generated/Gen_{gen+1}_min.png", bbox_inches="tight")
 
     print(f"Gen {gen+1} min: {min_fitness}")
     for person in pop:
