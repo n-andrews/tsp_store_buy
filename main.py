@@ -10,19 +10,17 @@ import numpy as np
 RANDOM_GEN = None
 
 # Configuration
-POPULATION_LIMIT = 50
-DISTANCE = [
-    [0, 1, 1, 4],
-    [1, 0, 2, 5],
-    [1, 2, 0, 3],
-    [4, 5, 3, 0],
-]
-ITEMS = [[2, 3], [3, 2], [1, 1], [4, 1]]
+POPULATION_LIMIT = 4
+DISTANCE = [[0,3,12,5],
+            [3,0,7,5],
+            [12,7,0,5],
+            [5,5,5,0]]
+ITEMS = [[13990, 39990], [39990, 29990], [19990, 19990], [49990, 19990]]
 
-ROUTE_FITNESS_WEIGHT = 1
+ROUTE_FITNESS_WEIGHT = 50.7
 BUY_FITNESS_WEIGHT = 1
 
-GENERATION_THRESHOLD = 100
+GENERATION_THRESHOLD = 20
 
 # Graph configuration
 temp = nx.DiGraph()
@@ -70,16 +68,28 @@ class Person:
         sum_route = 0
         sum_items = 0
 
-        for i in range(len(self.route) - 1):
-            # calculate route fitness.
-            sum_route += DISTANCE[self.route[i]][self.route[i + 1]]
-            # calculate items
-            if self.route[i + 1] in self.buy:
-                index = self.buy.index(self.route[i + 1])
-                sum_items += ITEMS[self.route[i + 1]][self.buy_order[index]]
+        for i in range(len(self.route)):
+            try:
+                sum_route += DISTANCE[self.route[i]][self.route[i+1]]
+            except IndexError:
+                pass
+            if self.route[i] in self.buy:
+                index = self.buy.index(self.route[i])
+                sum_items += ITEMS[self.route[i]][self.buy_order[index]]
                 self._update_bought()
             if self.done:
                 break
+
+        # for i in range(len(self.route) - 1):
+        #     # calculate route fitness.
+        #     sum_route += DISTANCE[self.route[i]][self.route[i + 1]]
+        #     # calculate items
+        #     if self.route[i + 1] in self.buy:
+        #         index = self.buy.index(self.route[i + 1])
+        #         sum_items += ITEMS[self.route[i + 1]][self.buy_order[index]]
+        #         self._update_bought()
+        #     if self.done:
+        #         break
 
         total = sum_items * BUY_FITNESS_WEIGHT + sum_route * ROUTE_FITNESS_WEIGHT
         return total
@@ -240,7 +250,7 @@ def _util_init_random_gen(seed):
 
 
 if __name__ == "__main__":
-    seed = "humberto trabaja"
+    seed = "humbdfja"
 
     RANDOM_GEN = random.Random(seed)
     winner = run()
