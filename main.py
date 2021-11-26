@@ -11,13 +11,15 @@ RANDOM_GEN = None
 
 # Configuration
 POPULATION_LIMIT = 4
-DISTANCE = [[0,3,12,5],
-            [3,0,7,5],
-            [12,7,0,5],
-            [5,5,5,0]]
-ITEMS = [[13990, 39990], [39990, 29990], [19990, 19990], [49990, 19990]]
+DISTANCE = [
+    [0, 1, 1, 4],
+    [1, 0, 2, 5],
+    [1, 2, 0, 3],
+    [4, 5, 3, 0],
+]
+ITEMS = [[2, 3], [3, 2], [1, 1], [4, 1]]
 
-ROUTE_FITNESS_WEIGHT = 50.7
+ROUTE_FITNESS_WEIGHT = 1
 BUY_FITNESS_WEIGHT = 1
 
 GENERATION_THRESHOLD = 20
@@ -38,7 +40,7 @@ labels = nx.get_edge_attributes(G, "weight")
 nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 
 ## Save initial graph
-plt.savefig("Grafo inicial.png")
+plt.savefig("generated/Grafo inicial.png")
 
 # Definition
 class Person:
@@ -73,13 +75,12 @@ class Person:
                 sum_route += DISTANCE[self.route[i]][self.route[i+1]]
             except IndexError:
                 pass
-            if self.route[i] in self.buy:
+            if self.route[i] in self.buy and not self.done:
                 index = self.buy.index(self.route[i])
                 sum_items += ITEMS[self.route[i]][self.buy_order[index]]
                 self._update_bought()
-            if self.done:
-                break
 
+        go_back_node = DISTANCE[self.route[-1]][0]
         # for i in range(len(self.route) - 1):
         #     # calculate route fitness.
         #     sum_route += DISTANCE[self.route[i]][self.route[i + 1]]
@@ -91,7 +92,7 @@ class Person:
         #     if self.done:
         #         break
 
-        total = sum_items * BUY_FITNESS_WEIGHT + sum_route * ROUTE_FITNESS_WEIGHT
+        total = sum_items * BUY_FITNESS_WEIGHT + sum_route * ROUTE_FITNESS_WEIGHT + go_back_node * ROUTE_FITNESS_WEIGHT
         return total
 
     def __str__(self):
@@ -215,7 +216,6 @@ def print_generation(pop: List[Person], gen: int):
     person = pop_by_fitness[min_fitness]
     route = person.route
     color_map = ["red" if node in person.buy else "blue" for node in route]
-
     plt.figure()
     xD = nx.path_graph(route, G)
     nx.draw(xD, pos=pos, with_labels=True, node_color=color_map)
@@ -226,6 +226,7 @@ def print_generation(pop: List[Person], gen: int):
         )
     plt.title(f"Ruta: {route} \n Peso total:{min_fitness} \n{bought_where_message}")
     plt.savefig(f"generated/Gen_{gen+1}_min.png", bbox_inches="tight")
+    plt.close()
 
     print(f"Gen {gen+1} min: {min_fitness}")
     for person in pop:
@@ -254,4 +255,5 @@ if __name__ == "__main__":
 
     RANDOM_GEN = random.Random(seed)
     winner = run()
+    winner.route.append(0)
     print("\nCamino recomendado:\n", winner)
