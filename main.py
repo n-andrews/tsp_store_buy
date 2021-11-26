@@ -79,8 +79,6 @@ class Person:
                 index = self.buy.index(self.route[i])
                 sum_items += ITEMS[self.route[i]][self.buy_order[index]]
                 self._update_bought()
-
-        go_back_node = DISTANCE[self.route[-1]][0]
         # for i in range(len(self.route) - 1):
         #     # calculate route fitness.
         #     sum_route += DISTANCE[self.route[i]][self.route[i + 1]]
@@ -92,7 +90,10 @@ class Person:
         #     if self.done:
         #         break
 
-        total = sum_items * BUY_FITNESS_WEIGHT + sum_route * ROUTE_FITNESS_WEIGHT + go_back_node * ROUTE_FITNESS_WEIGHT
+        total = sum_items * BUY_FITNESS_WEIGHT + sum_route * ROUTE_FITNESS_WEIGHT 
+        go_back_node = DISTANCE[self.route[-1]][0]
+        total += go_back_node * ROUTE_FITNESS_WEIGHT
+                
         return total
 
     def __str__(self):
@@ -214,8 +215,9 @@ def print_generation(pop: List[Person], gen: int):
 
     min_fitness = min(pop_by_fitness.keys())
     person = pop_by_fitness[min_fitness]
-    route = person.route
-    color_map = ["red" if node in person.buy else "blue" for node in route]
+    route = list(person.route)
+    color_map = ["red" if node in person.buy else "green" for node in route]
+    route.append(0)
     plt.figure()
     xD = nx.path_graph(route, G)
     nx.draw(xD, pos=pos, with_labels=True, node_color=color_map)
